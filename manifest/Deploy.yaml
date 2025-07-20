@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: my-app
-          image: octaacrtestng.azurecr.io/my-app:latest
+          image: octaacrtestng.azurecr.io/myapptest:latest
           ports:
             - containerPort: 3000
