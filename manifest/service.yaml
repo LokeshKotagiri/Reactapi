@@ -8,5 +8,5 @@ spec:
     app: my-app
   ports:
     - protocol: TCP
-      port: 80        # external port
+      port: 8081      # external port
       targetPort: 80 # React app port inside container
