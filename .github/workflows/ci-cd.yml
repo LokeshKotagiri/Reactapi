@@ -41,3 +41,30 @@ jobs:
 
       - name: Push Docker Image
         run: docker push my-app:${{ github.sha }}
+  deploy-aks:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set AKS Context
+        uses: azure/aks-set-context@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster-name: octa-aks
+          resource-group: octa-aks-rg # ✅ Change if different
+
+      - name: Update Deployment Image
+        run: |
+          kubectl set image deployment/my-app my-app=octaacrtestng.azurecr.io/my-app:${{ github.sha }} -n default
+          kubectl rollout status deployment/my-app -n default
+
+      - name: Apply other manifest files (if needed)
+        run: |
+          kubectl apply -f manifest/
