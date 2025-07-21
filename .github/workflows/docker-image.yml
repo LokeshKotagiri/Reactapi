@@ -61,7 +61,24 @@ jobs:
       - name: Update Deployment Image
         run: |
           kubectl set image deployment/my-app my-app=octaacrtestng.azurecr.io/my-app:${{ github.sha }} -n default
-          
+      - name: Send Email notification on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: ❌ Security Scan Failed - ${{ github.repository }}
+          body: |
+            The security scan for build ${{ github.sha }} failed.
+
+            Please review the logs in GitHub Actions for details.
+            Repository: ${{ github.repository }}
+            Workflow: ${{ github.workflow }}
+            Job: ${{ github.job }}
+          to: ktss.kotagiri@gmail.com
+          from: GitHub Security Bot <github@example.com> 
 
       # - name: Apply other manifest files (if needed)
       #   run: |
