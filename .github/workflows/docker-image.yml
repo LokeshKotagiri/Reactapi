@@ -35,6 +35,16 @@ jobs:
     
         - name: Push Docker Image
           run: docker push octaacrtestng.azurecr.io/myapptest:${{ github.sha }}
+        - name: Scan Node Dependencies for Vulnerabilities
+          run: npm audit --audit-level=high || true
+
+        - name: Scan Docker Image with Trivy
+          uses: aquasecurity/trivy-action@master
+          with:
+            image-ref: 'octaacrtestng.azurecr.io/myapptest:${{ github.sha }}'
+            format: 'table'
+            exit-code: '1'
+            severity: 'CRITICAL,HIGH'
 
   deploy-aks:
     needs: build-and-push
